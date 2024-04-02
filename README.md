@@ -1,4 +1,4 @@
-# MealFit Back-End
+# Koliseum Academy Back-End
 
 Ce dépôt est dédié au backend de l'application Koliseum Academy, une solution révolutionnaire de gestion d'entraînement conçue pour répondre à la demande croissante de cours de sports de combat individualisés ou en petits groupes, offrant une approche personnalisée similaire à celle de Doctolib.
 
@@ -34,7 +34,7 @@ Après avoir cloné le code source sur votre machine avec `git clone`, suivez ce
 
 ## Architecture du projet
 
-L'application Back-End MealFit suit un modèle d'architecture en couches, spécifiquement le modèle Modèle-Vue-Contrôleur (MVC) avec une couche de Service supplémentaire. Voici un bref aperçu de chaque couche :
+L'application Back-End Koliseum Academy suit un modèle d'architecture en couches, spécifiquement le modèle Modèle-Vue-Contrôleur (MVC) avec une couche de Service supplémentaire. Voici un bref aperçu de chaque couche :
 
 ### Model
 
