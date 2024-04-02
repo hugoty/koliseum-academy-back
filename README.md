@@ -28,9 +28,9 @@ Après avoir cloné le code source sur votre machine avec `git clone`, suivez ce
 
 3. Si voulez deployer
 
-```bash
+   ```bash
    npm run build
-```
+   ```
 
 ## Architecture du projet
 
