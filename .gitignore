@@ -21,3 +21,5 @@ pids
 
 # Windows
 Thumbs.db
+
+.env
