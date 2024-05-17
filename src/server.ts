@@ -1,24 +1,24 @@
-import mongoose from "mongoose";
 import { app } from "./app";
+import { sequelize, syncModels } from "./models";
 
-// mongodb connection
-const PORT = process.env.PORT || 3333;
-const mongoURI = process.env.MONGO_URI;
+// Configurations
+const PORT = process.env.APPLICATION_PORT || 3333;
 
-if (!mongoURI) {
-    console.error("MONGO_URI is not defined in .env");
-    process.exit(1); // Quitte le processus avec un code d'erreur
-}
+const startServer = async () => {
+    try {
+        await sequelize.authenticate();
+        console.log("Connected to MariaDB");
 
-mongoose
-    .connect(mongoURI)
-    .then(() => {
-        console.log("Connected to MongoDB");
-    })
-    .catch((err) => {
-        console.error("Could not connect to MongoDB", err);
-    });
+        // Synchronisez les modèles avec la base de données
+        await syncModels();
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("Unable to connect to the database:", error);
+        process.exit(1); // Quitte le processus avec un code d'erreur
+    }
+};
+
+startServer();
