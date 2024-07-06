@@ -8,7 +8,7 @@ interface IUserAttributes {
     lastName?: string;
     email: string;
     passwordHash: string;
-    salt: string; // Ajout de la colonne pour stocker le sel
+    salt: string;
     dateOfBirth?: Date;
 }
 
@@ -23,14 +23,13 @@ class User
     public lastName?: string;
     public email!: string;
     public passwordHash!: string;
-    public salt!: string; // Déclaration de la propriété salt
+    public salt!: string;
     public dateOfBirth?: Date;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 
     public async checkPassword(password: string): Promise<boolean> {
-        // Utilisation du sel stocké pour comparer le mot de passe
         const hash = await bcrypt.hash(password, this.salt);
         return hash === this.passwordHash;
     }
@@ -61,7 +60,6 @@ User.init(
             allowNull: false,
         },
         salt: {
-            // Définition de la colonne pour stocker le sel
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -76,10 +74,8 @@ User.init(
         hooks: {
             beforeSave: async (user: User) => {
                 if (user.changed("passwordHash")) {
-                    // Génération d'un nouveau sel pour chaque mot de passe
                     const salt = await bcrypt.genSalt(12);
                     user.salt = salt;
-                    // Utilisation du nouveau sel pour hashage du mot de passe
                     user.passwordHash = await bcrypt.hash(
                         user.passwordHash,
                         salt
