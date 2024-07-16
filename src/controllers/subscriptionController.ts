@@ -14,9 +14,19 @@ class SubscriptionController {
 
     async create(req: Request, res: Response) {
         await genericController(req, res, async (req: Request, res: Response) => {
+            const newSubscription = await subscriptionService.create(req.body);
+            res.status(201).json(newSubscription);
+        }, false);
+    }
+
+    async subscribe(req: Request, res: Response) {
+        await genericController(req, res, async (req: Request, res: Response) => {
             const subscriptionData = req.body;
             subscriptionData.userId = Number(req.params.id);
-            const newSubscription = await subscriptionService.create(subscriptionData);
+            const newSubscription = await subscriptionService.create({
+                userId: (req as any).user.id,
+                courseId: Number(req.params.id)
+            });
             res.status(201).json(newSubscription);
         }, false);
     }
