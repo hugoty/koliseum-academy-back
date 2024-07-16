@@ -1,8 +1,12 @@
-import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { Application } from "express";
-import models, { sequelize } from "./models";
+import express, { Application } from "express";
+import { sequelize } from "./models";
+import authRouter from "./routes/authRoutes";
+import courseRouter from "./routes/courseRoutes";
+import sportRouter from "./routes/sportRoutes";
+import subscriptionRouter from "./routes/subscriptionRoutes";
+import userRouter from "./routes/userRoutes";
 
 dotenv.config();
 
@@ -18,7 +22,7 @@ const syncDatabase = async () => {
     try {
         await sequelize.authenticate();
         console.log("Connection has been established successfully.");
-        await sequelize.sync({ force: true }); // 'force: true' recrée les tables à chaque démarrage
+        await sequelize.sync(); // 'force: true' recrée les tables à chaque démarrage
         console.log("Database synchronized successfully.");
     } catch (error) {
         console.error("Unable to connect to the database:", error);
@@ -29,6 +33,11 @@ const syncDatabase = async () => {
 syncDatabase();
 
 // Routes
-//app.use("/api", userRoutes);
+app.use("/course", courseRouter);
+app.use("/subscription", subscriptionRouter);
+app.use("/user", userRouter);
+app.use("/auth", authRouter);
+app.use("/sport", sportRouter);
 
 export { app };
+

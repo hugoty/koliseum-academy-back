@@ -1,6 +1,8 @@
-import { DataTypes, Model, Optional } from "sequelize";
 import bcrypt from "bcrypt";
+import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../config/database";
+import Course from "./course"; // Import the Course model
+import Subscription from "./subscription"; // Import the Subscription model
 
 interface IUserAttributes {
     id?: number;
@@ -10,14 +12,16 @@ interface IUserAttributes {
     passwordHash: string;
     salt: string;
     dateOfBirth?: Date;
+    subscriptions?: Subscription[];
+    roles?: string;
+    courses?: Course[];
 }
 
-interface IUserCreationAttributes extends Optional<IUserAttributes, "id"> {}
+interface IUserCreationAttributes extends Optional<IUserAttributes, "id" | "roles" | "subscriptions" | "courses"> { }
 
 class User
     extends Model<IUserAttributes, IUserCreationAttributes>
-    implements IUserAttributes
-{
+    implements IUserAttributes {
     public id!: number;
     public firstName?: string;
     public lastName?: string;
@@ -25,6 +29,9 @@ class User
     public passwordHash!: string;
     public salt!: string;
     public dateOfBirth?: Date;
+    public roles?: string;
+    public subscriptions?: Subscription[];
+    public courses?: Course[];
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -67,19 +74,28 @@ User.init(
             type: DataTypes.DATE,
             allowNull: true,
         },
+        roles: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: JSON.stringify(["student"]),
+            get() {
+                const roles = this.getDataValue("roles");
+                return roles ? JSON.parse(roles) : [];
+            },
+            set(value: string[]) {
+                this.setDataValue("roles", JSON.stringify(value));
+            }
+        },
     },
     {
         sequelize,
-        tableName: "users",
+        tableName: "user",
         hooks: {
             beforeSave: async (user: User) => {
                 if (user.changed("passwordHash")) {
                     const salt = await bcrypt.genSalt(12);
                     user.salt = salt;
-                    user.passwordHash = await bcrypt.hash(
-                        user.passwordHash,
-                        salt
-                    );
+                    user.passwordHash = await bcrypt.hash(user.passwordHash, salt);
                 }
             },
         },

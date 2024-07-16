@@ -1,39 +1,34 @@
+import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import User from "../models/User";
+import User from "../models/user";
 
-export const verifyToken = async (req: any, res: any, next: any) => {
+export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     const bearerHeader = req.headers["authorization"];
-
     if (!bearerHeader) {
         return res.status(403).send({ message: "No token provided." });
     }
+
     const token = bearerHeader.split(" ")[1];
     if (!token) {
         return res.status(403).send({ message: "No token provided." });
     }
 
     try {
-        const decoded = jwt.verify(token, "token") as JwtPayload;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
 
-        // Vérifier si decoded est défini et a une propriété 'exp'
         if (!decoded || !decoded.exp || decoded.exp < Date.now() / 1000) {
             throw new Error("Invalid access token");
         }
 
-        //find user by id
-        const user = await User.findOne({ _id: decoded.id });
-
+        const user = await User.findByPk(decoded.id);
         if (!user) {
             throw new Error("User not found");
         }
 
-        req.user = user;
-
+        (req as any).user = user;
         next();
     } catch (error) {
         console.error("Error verifying token:", error);
-        return res
-            .status(403)
-            .send({ message: "Failed to authenticate token." });
+        return res.status(403).send({ message: "Failed to authenticate token." });
     }
 };
