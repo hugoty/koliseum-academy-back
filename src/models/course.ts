@@ -8,7 +8,7 @@ interface ICourseAttributes {
     places: number;
     location: string;
     price: number;
-    userId?: number;
+    ownerId?: number;
     levels?: string;
 }
 
@@ -23,7 +23,7 @@ class Course
     public places!: number;
     public location!: string;
     public price!: number;
-    public userId?: number;
+    public ownerId?: number;
     public levels?: string;
 
     public readonly createdAt!: Date;
@@ -69,7 +69,7 @@ Course.init(
                 this.setDataValue("levels", JSON.stringify(value));
             }
         },
-        userId: {
+        ownerId: {
             type: DataTypes.INTEGER.UNSIGNED,
             allowNull: false,
             references: {

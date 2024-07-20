@@ -1,6 +1,8 @@
 import { RequestStatus } from "../models/data";
 import subscriptionRepository from "../repositories/subscriptionRepository";
 import { genericServRepo } from "../utils/error";
+import courseService from "./courseService";
+import userService from "./userService";
 
 class SubscriptionService {
 
@@ -21,6 +23,8 @@ class SubscriptionService {
     async getById(id: number) {
         return await genericServRepo('subscriptionService.getById', 'Error fetching subscription', [id], async (id) => {
             const subscription = await subscriptionRepository.getById(id);
+            subscription.dataValues.user = await userService.getById(subscription.userId);
+            subscription.dataValues.course = await courseService.getById(subscription.courseId);
             return subscription;
         });
     }
@@ -61,13 +65,6 @@ class SubscriptionService {
         return await genericServRepo('subscriptionService.delete', 'Error deleting', [id], async (id) => {
             const deletedSubscription = await subscriptionRepository.delete(id);
             return deletedSubscription;
-        });
-    }
-
-    async getCourse(id: number) {
-        return await genericServRepo('subscriptionService.getCourse', 'Error fetching subscription\'s course', [id], async (id) => {
-            const course = await subscriptionRepository.getCourseBySubscriptionId(id);
-            return course.id;
         });
     }
 }

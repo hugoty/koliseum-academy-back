@@ -1,4 +1,6 @@
 import Course from "../models/course";
+import Sport from "../models/sport";
+import User from "../models/user";
 import { checkAttr } from "../utils/checks";
 import { genericServRepo } from "../utils/error";
 
@@ -6,26 +8,42 @@ class CourseRepository {
 
     async create(data: any) {
         return await genericServRepo('courseRepository.create', 'Error creating course', [data], async (data) => {
-            data = checkAttr(data, 'user', [], ['userId', 'id']);
+            data = checkAttr(data, 'user', [], ['ownerId', 'id']);
             const newCourse = await Course.create(data);
             return newCourse;
         });
     }
 
-    async getCoachByCourseId(id: number) {
-        return await genericServRepo('courseRepository.getCoachByCourseId', 'Error fetching course\'s coach', [id], async (id) => {
-            const course = await Course.findByPk(id, { include: 'user' });
-            if (!course) {
-                throw new Error('CODE404: Course not found');
+    async getCoachCourses(id: number) {
+        return await genericServRepo('courseRepository.getCoachCourses', 'Error fetching coach\'s courses', [id], async (id) => {
+            const courses = await Course.findAll({
+                where: { ownerId: id }
+            });
+            if (!courses) {
+                throw new Error('CODE404: Courses not found');
             }
-            if (!('user' in course)) throw new Error('CODE404: User not found in course');
-            return (course as any);
+            return courses;
         });
     }
 
     async getById(id: number) {
         return await genericServRepo('courseRepository.getById', 'Error fetching course', [id], async (id) => {
-            const course = await Course.findByPk(id);
+            const course = await Course.findByPk(id, {
+                include: [
+                    {
+                        model: Sport,
+                        through: {
+                            attributes: ['id']
+                        }
+                    },
+                    {
+                        model: User,
+                        through: {
+                            attributes: ['id', 'status']
+                        }
+                    }
+                ]
+            });
             if (!course) {
                 throw new Error('CODE404: Course not found');
             }
@@ -39,7 +57,7 @@ class CourseRepository {
             if (!course) {
                 throw new Error('CODE404: Course not found');
             }
-            data = checkAttr(data, 'course', [], ['userId', 'id']);
+            data = checkAttr(data, 'course', [], ['ownerId', 'id']);
             await course.update(data);
             return course;
         });

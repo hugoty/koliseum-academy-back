@@ -29,28 +29,6 @@ class SubscriptionRepository {
         });
     }
 
-    async getCourseBySubscriptionId(id: number) {
-        return await genericServRepo('subscriptionRepository.getCourseBySubscriptionId', 'Error fetching subscription\'s course', [id], async (id) => {
-            const subscription = await Subscription.findByPk(id, { include: 'course' });
-            if (!subscription) {
-                throw new Error('CODE404: Subscription not found');
-            }
-            if (!('course' in subscription)) throw new Error('CODE404: Course not found in subscription');
-            return (subscription as any);
-        });
-    }
-
-    async getUserBySubscriptionId(id: number) {
-        return await genericServRepo('subscriptionRepository.getUserBySubscriptionId', 'Error fetching subscription\'s user', [id], async (id) => {
-            const subscription = await Subscription.findByPk(id, { include: 'user' });
-            if (!subscription) {
-                throw new Error('CODE404: Subscription not found');
-            }
-            if (!('user' in subscription)) throw new Error('CODE404: User not found in course');
-            return (subscription as any);
-        });
-    }
-
     async update(id: number, data: any) {
         return await genericServRepo('subscriptionRepository.update', 'Error updating subscription', [id, data], async (id, data) => {
             const subscription = await Subscription.findByPk(id);

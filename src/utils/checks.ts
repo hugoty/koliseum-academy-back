@@ -1,5 +1,8 @@
+import { Request } from "express";
+import Course from "../models/course";
 import { Role } from "../models/data";
 import User from "../models/user";
+
 
 export function checkAttr(obj: any, errorKey: string, required: string[], forbidden: string[] = []) {
     if (!obj || typeof obj !== 'object') throw new Error('removeAttributes : argument 0 should be an object.');
@@ -23,3 +26,20 @@ export function checkEmail(email: string) {
 export function isAdmin(user: User) { return user.roles?.includes(Role.Admin); }
 
 export function isCoach(user: User) { return user.roles?.includes(Role.Coach); }
+
+export async function checkCourseCoach(req: Request) {
+    if (!isAdminOrCourseOwner(req)) throw new Error('CODE403: The user is not the owner of this course');
+}
+
+export async function isAdminOrCourseOwner(req: Request) {
+    if (!('user' in req)) return false;
+    if (isAdmin((req as any).user)) return true;
+    return await isCourseOwner(req);
+}
+
+export async function isCourseOwner(req: Request) {
+    const user = (req as any).user;
+    const courseId = Number(req.params.id);
+    const course = await Course.findByPk(courseId);
+    return course && user.id === course.dataValues.ownerId
+}

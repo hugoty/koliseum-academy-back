@@ -21,8 +21,6 @@ class SubscriptionController {
 
     async subscribe(req: Request, res: Response) {
         await genericController(req, res, async (req: Request, res: Response) => {
-            const subscriptionData = req.body;
-            subscriptionData.userId = Number(req.params.id);
             const newSubscription = await subscriptionService.create({
                 userId: (req as any).user.id,
                 courseId: Number(req.params.id)
@@ -34,12 +32,11 @@ class SubscriptionController {
     async getById(req: Request, res: Response) {
         await genericController(req, res, async (req: Request, res: Response) => {
             const id = Number(req.params.id);
-            const course = await subscriptionService.getCourse(id);
             const subscription = await subscriptionService.getById(id);
             if (
                 !isAdmin((req as any).user) &&
-                course.userId !== (req as any).user.id &&
-                subscription.userId !== (req as any).user.id
+                subscription.dataValues.course.ownerId !== (req as any).user.id &&
+                subscription.dataValues.userId !== (req as any).user.id
             ) throw new Error('CODE403: The user is not the owner of this subscription');
             if (!subscription) {
                 res.status(404).json({ message: `Subscription with id ${id} not found` });
@@ -69,10 +66,10 @@ class SubscriptionController {
     async accept(req: Request, res: Response) {
         await genericController(req, res, async (req: Request, res: Response) => {
             const subscriptionId = Number(req.params.id);
-            const course = await subscriptionService.getCourse(subscriptionId);
+            const subscription = await subscriptionService.getById(subscriptionId);
             if (
                 !isAdmin((req as any).user) &&
-                course.userId !== (req as any).user.id
+                subscription.dataValues.course.ownerId !== (req as any).user.id
             ) throw new Error('CODE403: The user is not the owner of the course');
             const updatedSubscription = await subscriptionService.accept(subscriptionId);
             res.json(updatedSubscription);
@@ -82,10 +79,10 @@ class SubscriptionController {
     async reject(req: Request, res: Response) {
         await genericController(req, res, async (req: Request, res: Response) => {
             const subscriptionId = Number(req.params.id);
-            const course = await subscriptionService.getCourse(subscriptionId);
+            const subscription = await subscriptionService.getById(subscriptionId);
             if (
                 !isAdmin((req as any).user) &&
-                course.userId !== (req as any).user.id
+                subscription.dataValues.course.ownerId !== (req as any).user.id
             ) throw new Error('CODE403: The user is not the owner of the course');
             const updatedSubscription = await subscriptionService.reject(subscriptionId);
             res.json(updatedSubscription);

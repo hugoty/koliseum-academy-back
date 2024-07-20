@@ -23,7 +23,7 @@ class UserController {
     async getById(req: Request, res: Response) {
         await genericController(req, res, async (req: Request, res: Response) => {
             const userId = Number(req.params.id);
-            const user = await userService.getById(userId);
+            const user = await userService.getById(userId, !isAdmin((req as any).user));
             res.json(user);
         });
     }
@@ -31,7 +31,7 @@ class UserController {
     async getProfile(req: Request, res: Response) {
         await genericController(req, res, async (req: Request, res: Response) => {
             const userId = (req as any).user.id;
-            const user = await userService.getById(userId);
+            const user = await userService.getById(userId, false);
             res.json(user);
         }, false);
     }

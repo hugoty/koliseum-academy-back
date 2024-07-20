@@ -1,4 +1,5 @@
 import { Role } from "../models/data";
+import courseRepository from "../repositories/courseRepository";
 import userRepository from "../repositories/userRepository";
 import { checkAttr, checkEmail, isCoach } from "../utils/checks";
 import { genericServRepo } from "../utils/error";
@@ -29,10 +30,20 @@ class UserService {
         });
     }
 
-    async getById(id: number) {
+    async getById(id: number, publicProfile = true) {
         return await genericServRepo('userService.getById', 'Error fetching user', [id], async (id) => {
             const user = await userRepository.getById(id);
-            return user;
+            let res = user;
+            if (publicProfile) res = {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName
+            };
+            if (user.roles.includes(Role.Coach)) {
+                res.Sports = user.Sports;
+                res.ownedCourses = await courseRepository.getCoachCourses(user.id);
+            }
+            return res;
         });
     }
 

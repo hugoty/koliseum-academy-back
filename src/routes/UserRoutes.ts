@@ -10,7 +10,7 @@ userRouter.get("/", verifyToken, userController.getProfile);
 userRouter.post("/:id/grant-coach", verifyToken, verifyAdmin, userController.grantCoachRole);
 userRouter.post("/:id/revoke-coach", verifyToken, verifyAdmin, userController.revokeCoachRole);
 userRouter.post("/create", userController.create);
-userRouter.get("/:id", verifyToken, verifyAdmin, userController.getById);
+userRouter.get("/:id", verifyToken, userController.getById);
 userRouter.put("/:id", verifyToken, verifyAdmin, userController.update);
 userRouter.delete("/:id", verifyToken, verifyAdmin, userController.delete);
 userRouter.put("/", verifyToken, userController.updateProfile);

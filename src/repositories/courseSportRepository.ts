@@ -6,7 +6,7 @@ class CourseSportRepository {
 
     async getById(id: number) {
         return await genericServRepo('courseSportRepository.getById', 'Error fetching course\'s sports', [id], async (id) => {
-            const courseSport = await CourseSport.findByPk(id);
+            const courseSport = await CourseSport.findByPk(id, { include: 'user' });
             if (!courseSport) {
                 throw new Error("CODE404: Course\'s sport not found");
             }

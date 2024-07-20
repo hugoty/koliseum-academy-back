@@ -2,6 +2,7 @@ import { Level } from "../models/data";
 import courseRepository from "../repositories/courseRepository";
 import { checkAttr } from "../utils/checks";
 import { genericServRepo } from "../utils/error";
+import userService from "./userService";
 
 class CourseService {
 
@@ -15,6 +16,8 @@ class CourseService {
         }
     }
 
+    bidon() { return true; }
+
     async create(data: any) {
         return await genericServRepo('courseService.create', 'Error creating course', [data], async (data) => {
             this.checkLevels(data);
@@ -23,9 +26,13 @@ class CourseService {
         });
     }
 
-    async getById(id: number) {
+    async getById(id: number, publicCourse = true) {
         return await genericServRepo('courseService.getById', 'Error fetching course', [id], async (id) => {
-            const course = await courseRepository.getById(id);
+            let course = await courseRepository.getById(id);
+            if (publicCourse) delete course.dataValues.Users;
+            const owner = await userService.getById(course.ownerId);
+            delete owner.ownedCourses;
+            course.dataValues.owner = owner;
             return course;
         });
     }

@@ -1,3 +1,4 @@
+import Course from "../models/course";
 import Sport from "../models/sport";
 import User from "../models/user";
 import { checkAttr } from "../utils/checks";
@@ -23,12 +24,20 @@ class UserRepository {
     async getById(id: number) {
         return await genericServRepo('userRepository.getById', 'Error fetching user', [id], async (id) => {
             const user = await User.findByPk(id, {
-                include: {
-                    model: Sport,
-                    through: {
-                        attributes: ['id', 'level'] // Include level from UserSport
+                include: [
+                    {
+                        model: Sport,
+                        through: {
+                            attributes: ['id', 'level']
+                        }
+                    },
+                    {
+                        model: Course,
+                        through: {
+                            attributes: ['id', 'status']
+                        }
                     }
-                }
+                ]
             });
             if (!user) {
                 throw new Error('CODE404: User not found');

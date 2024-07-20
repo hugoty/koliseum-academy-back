@@ -23,7 +23,7 @@ class UserSportController {
             const userSportData = req.body;
             const userSportId = Number(req.params.id);
             const userSport = await userSportService.getById(userSportId);
-            if (isAdmin((req as any).user) || (req as any).user.id === userSport.userId) {
+            if (isAdmin((req as any).user) || (req as any).user.id === userSport.dataValues.userId) {
                 const updatedUserSport = await userSportService.update(userSportId, userSportData);
                 res.json(updatedUserSport);
             }
@@ -35,7 +35,7 @@ class UserSportController {
         await genericController(req, res, async (req: Request, res: Response) => {
             const userSportId = Number(req.params.id);
             const userSport = await userSportService.getById(userSportId);
-            if (isAdmin((req as any).user) || (req as any).user.id === userSport.userId) {
+            if (isAdmin((req as any).user) || (req as any).user.id === userSport.dataValues.userId) {
                 await userSportService.delete(userSportId);
                 res.json({ message: 'User\'s sport deleted successfully' });
             }
@@ -65,7 +65,6 @@ class UserSportController {
     async removeSport(req: Request, res: Response) {
         await genericController(req, res, async (req: Request, res: Response) => {
             const userSportId = Number(req.params.id);
-            const userSport = await userSportService.getById(userSportId);
             await userSportService.delete(userSportId);
             res.json({ message: 'User\'s sport deleted successfully' });
         });
