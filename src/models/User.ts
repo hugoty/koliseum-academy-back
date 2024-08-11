@@ -92,11 +92,6 @@ User.init(
         tableName: "user",
         hooks: {
             beforeSave: async (user: User) => {
-                if (user.changed("passwordHash")) {
-                    const salt = await bcrypt.genSalt(12);
-                    user.salt = salt;
-                    user.passwordHash = await bcrypt.hash(user.passwordHash, salt);
-                }
             },
         },
     }
