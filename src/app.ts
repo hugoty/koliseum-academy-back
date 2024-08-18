@@ -40,4 +40,3 @@ app.use("/auth", authRouter);
 app.use("/sport", sportRouter);
 
 export { app };
-
