@@ -10,13 +10,15 @@ class AuthController {
         const { email, password } = req.body;
 
         try {
-            const user = await User.findOne({ where: { email } });
-            if (!user) {
-                return res.status(401).json({ message: "Invalid email or password." });
+            if (!email || !password) {
+                return res.status(400).json({ message: 'Email and password are required.' });
             }
 
+            const user = await User.findOne({ where: { email } });
+
             const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-            if (!isPasswordValid) {
+            
+            if (!user || !isPasswordValid) {
                 return res.status(401).json({ message: "Invalid email or password." });
             }
 

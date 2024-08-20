@@ -3,6 +3,7 @@ import courseRepository from "../repositories/courseRepository";
 import userRepository from "../repositories/userRepository";
 import { checkAttr, checkEmail, isCoach } from "../utils/checks";
 import { genericServRepo } from "../utils/error";
+import bcrypt from 'bcrypt';
 
 class UserService {
 
@@ -16,7 +17,7 @@ class UserService {
     async create(data: any) {
         return await genericServRepo('userService.create', 'Error creating user', [data], async (data) => {
             try {
-                checkAttr(data, 'user', ['email']);
+                checkAttr(data, 'user', ['email', 'password']);
                 checkEmail(data.email);
                 const existingUser = await userRepository.getByEmail(data.email);
                 if (existingUser) throw new Error('CODE400: Email already used');
@@ -25,6 +26,15 @@ class UserService {
                     throw error;
                 }
             }
+
+            const salt = await bcrypt.genSalt(12);
+            const passwordHash = await bcrypt.hash(data.password, salt);
+            
+            // Add passwordHash and salt to the user data
+            data.passwordHash = passwordHash;
+            data.salt = salt;
+            delete data.password;
+
             const newUser = await userRepository.create(data);
             return newUser;
         });
