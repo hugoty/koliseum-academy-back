@@ -18,7 +18,13 @@ export enum Level {
     Expert = 'expert'
 }
 
-export interface SearchData {
+export interface CoachSearchData {
+    name?: string,
+    sports?: number[],
+    locations?: string[]
+}
+
+export interface CourseSearchData {
     coachName?: string,
     coachIds?: number[],
     sports?: number[],
@@ -28,5 +34,6 @@ export interface SearchData {
     minPlaces?: number,
     maxPlaces?: number,
     minRemainingPlaces?: number,
-    maxRemainingPlaces?: number
+    maxRemainingPlaces?: number,
+    levels?: Level[]
 }

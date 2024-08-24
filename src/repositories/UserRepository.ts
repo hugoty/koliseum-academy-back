@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import Course from "../models/course";
-import { SearchData } from "../models/data";
+import { CoachSearchData } from "../models/data";
 import Sport from "../models/sport";
 import User from "../models/user";
 import { checkAttr } from "../utils/checks";
@@ -15,13 +15,13 @@ class UserRepository {
         });
     }
 
-    async searchCoaches(data: SearchData) {
+    async searchCoaches(data: CoachSearchData) {
         return await genericServRepo('userRepository.searchCoaches', 'Error searching coaches', [data], async (data) => {
             const where: Record<string, any> = {};
-            if (data.coachName) {
+            if (data.name) {
                 where[Op.or as any] = [
-                    { firstName: { [Op.like]: `%${data.coachName}%` } },
-                    { lastName: { [Op.like]: `%${data.coachName}%` } }
+                    { firstName: { [Op.like]: `%${data.name}%` } },
+                    { lastName: { [Op.like]: `%${data.name}%` } }
                 ];
             }
             if (data.locations && data.locations.length > 0) {

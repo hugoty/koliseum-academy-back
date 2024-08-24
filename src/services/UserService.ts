@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { Role, SearchData } from '../models/data';
+import { CoachSearchData, Role } from '../models/data';
 import courseRepository from "../repositories/courseRepository";
 import userRepository from "../repositories/userRepository";
 import { checkAttr, checkEmail, isCoach } from "../utils/checks";
@@ -14,7 +14,7 @@ class UserService {
         });
     }
 
-    async searchCoaches(data: SearchData) {
+    async searchCoaches(data: CoachSearchData) {
         return await genericServRepo('userService.searchCoaches', 'Error searching coaches', [], async () => {
             const coaches = await userRepository.searchCoaches(data);
             return coaches;

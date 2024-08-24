@@ -1,4 +1,4 @@
-import { Level, SearchData } from "../models/data";
+import { CourseSearchData, Level } from "../models/data";
 import User from "../models/user";
 import courseRepository from "../repositories/courseRepository";
 import courseSportRepository from "../repositories/courseSportRepository";
@@ -11,6 +11,7 @@ import userService from "./userService";
 class CourseService {
 
     private checkLevels(data: any) {
+        if (!('levels' in data)) return;
         if (!Array.isArray(data.levels)) {
             throw new Error('CODE400: course\'s levels attribute should be an array');
         }
@@ -59,10 +60,11 @@ class CourseService {
         });
     }
 
-    async searchCourses(data: SearchData) {
+    async searchCourses(data: CourseSearchData) {
         return await genericServRepo('userService.searchCourses', 'Error searching courses', [], async () => {
+            this.checkLevels(data);
             if (data.coachName) {
-                const coaches = await userRepository.searchCoaches({ coachName: data.coachName });
+                const coaches = await userRepository.searchCoaches({ name: data.coachName });
                 if (coaches.length === 0) return [];
                 data.coachIds = coaches.map((coach: User) => coach.id);
             }
@@ -92,7 +94,7 @@ class CourseService {
     }
 
     async update(id: number, data: any) {
-        if (data.levels) this.checkLevels(data);
+        this.checkLevels(data);
         return await genericServRepo('courseService.update', 'Error updating course', [id, data], async (id, data) => {
             const course = await courseRepository.getById(id);
             if ('remainingPlaces' in data) {

@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import Course from "../models/course";
-import { SearchData } from "../models/data";
+import { CourseSearchData } from "../models/data";
 import Sport from "../models/sport";
 import User from "../models/user";
 import { checkAttr } from "../utils/checks";
@@ -16,7 +16,7 @@ class CourseRepository {
         });
     }
 
-    async searchCourses(data: SearchData) {
+    async searchCourses(data: CourseSearchData) {
         return await genericServRepo('courseRepository.searchCourses', 'Error searching courses', [data], async (data) => {
             const where: Record<string, any> = {};
 
@@ -65,6 +65,13 @@ class CourseRepository {
                 where.locations = {
                     [Op.or]: data.locations.map((location: string) => ({
                         [Op.like]: `%${location}%`
+                    }))
+                };
+            }
+            if (data.levels && data.levels.length > 0) {
+                where.levels = {
+                    [Op.or]: data.levels.map((level: string) => ({
+                        [Op.like]: `%${level}%`
                     }))
                 };
             }
