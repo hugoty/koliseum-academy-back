@@ -8,7 +8,7 @@ class CourseRepository {
 
     async create(data: any) {
         return await genericServRepo('courseRepository.create', 'Error creating course', [data], async (data) => {
-            data = checkAttr(data, 'user', [], ['ownerId', 'id']);
+            data = checkAttr(data, 'course', [], ['ownerId', 'id']);
             const newCourse = await Course.create(data);
             return newCourse;
         });

@@ -15,19 +15,17 @@ interface IUserAttributes {
     subscriptions?: Subscription[];
     roles?: string;
     courses?: Course[];
-    sports?: string;
 }
 
 interface IUserCreationAttributes
     extends Optional<
         IUserAttributes,
         "id" | "roles" | "subscriptions" | "courses"
-    > {}
+    > { }
 
 class User
     extends Model<IUserAttributes, IUserCreationAttributes>
-    implements IUserAttributes
-{
+    implements IUserAttributes {
     public id!: number;
     public firstName?: string;
     public lastName?: string;
@@ -92,25 +90,13 @@ User.init(
             set(value: string[]) {
                 this.setDataValue("roles", JSON.stringify(value));
             },
-        },
-        sports: {
-            type: DataTypes.STRING, // Changed to TEXT for JSON storage
-            allowNull: true,
-            defaultValue: JSON.stringify([""]),
-            get() {
-                const sports = this.getDataValue("sports");
-                return sports ? JSON.parse(sports) : [];
-            },
-            set(value: string[]) {
-                this.setDataValue("sports", JSON.stringify(value));
-            },
-        },
+        }
     },
     {
         sequelize,
         tableName: "user",
         hooks: {
-            beforeSave: async (user: User) => {},
+            beforeSave: async (user: User) => { },
         },
     }
 );

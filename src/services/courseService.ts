@@ -1,5 +1,7 @@
 import { Level } from "../models/data";
 import courseRepository from "../repositories/courseRepository";
+import courseSportRepository from "../repositories/courseSportRepository";
+import sportRepository from "../repositories/sportRepository";
 import { checkAttr } from "../utils/checks";
 import { genericServRepo } from "../utils/error";
 import userService from "./userService";
@@ -16,12 +18,29 @@ class CourseService {
         }
     }
 
-    bidon() { return true; }
-
     async create(data: any) {
         return await genericServRepo('courseService.create', 'Error creating course', [data], async (data) => {
             this.checkLevels(data);
+            if (!('sportIds' in data)) {
+                throw new Error('CODE400: course\'s sport ids are not provided');
+            }
+            if (!Array.isArray(data.sportIds)) {
+                throw new Error('CODE400: course\'s sport ids should be an array');
+            }
+            if (data.sportIds.length === 0) {
+                throw new Error('CODE400: course\'s sport ids array should not be empty');
+            }
+            for (let sportId of data.sportIds) {
+                try {
+                    const sport = await sportRepository.getById(sportId);
+                } catch (error: any) {
+                    throw new Error(`CODE400: sport id ${sportId} not found`);
+                }
+            }
             const newCourse = await courseRepository.create(data);
+            for (let sportId of data.sportIds) {
+                await courseSportRepository.create({ courseId: newCourse.id, sportId });
+            }
             return newCourse;
         });
     }

@@ -9,8 +9,8 @@ class CourseSportController {
         await genericController(req, res, async (req: Request, res: Response) => {
             await checkCourseCoach(req);
             const courseId = Number(req.params.id);
-            const courseSportId = Number(req.params.courseSportId);
-            const newUserSport = await courseSportService.create({ courseId, courseSportId });
+            const sportId = Number(req.params.sportId);
+            const newUserSport = await courseSportService.create({ courseId, sportId });
             res.status(201).json(newUserSport);
         });
     }

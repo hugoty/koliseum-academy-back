@@ -13,7 +13,7 @@ const models = {
     Subscription,
     Sport,
     UserSport,
-    CourseSport,
+    CourseSport
 };
 
 export { sequelize };
