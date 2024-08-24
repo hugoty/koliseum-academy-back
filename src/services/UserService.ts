@@ -1,9 +1,9 @@
-import { Role } from "../models/data";
+import bcrypt from 'bcrypt';
+import { Role, SearchData } from '../models/data';
 import courseRepository from "../repositories/courseRepository";
 import userRepository from "../repositories/userRepository";
 import { checkAttr, checkEmail, isCoach } from "../utils/checks";
 import { genericServRepo } from "../utils/error";
-import bcrypt from 'bcrypt';
 
 class UserService {
 
@@ -11,6 +11,13 @@ class UserService {
         return await genericServRepo('userService.getAll', 'Error fetching all users', [], async () => {
             const users = await userRepository.getAll();
             return users;
+        });
+    }
+
+    async searchCoaches(data: SearchData) {
+        return await genericServRepo('userService.searchCoaches', 'Error searching coaches', [], async () => {
+            const coaches = await userRepository.searchCoaches(data);
+            return coaches;
         });
     }
 
@@ -29,7 +36,7 @@ class UserService {
 
             const salt = await bcrypt.genSalt(12);
             const passwordHash = await bcrypt.hash(data.password, salt);
-            
+
             // Add passwordHash and salt to the user data
             data.passwordHash = passwordHash;
             data.salt = salt;
@@ -43,7 +50,7 @@ class UserService {
     async getById(id: number, publicProfile = true) {
         return await genericServRepo('userService.getById', 'Error fetching user', [id], async (id) => {
             const user = await userRepository.getById(id);
-            let res = user;
+            let res = user.dataValues;
             if (publicProfile) res = {
                 id: user.id,
                 firstName: user.firstName,
@@ -77,8 +84,7 @@ class UserService {
 
     async update(id: number, data: any) {
         return await genericServRepo('userService.update', 'Error updating user', [id, data], async (id, data) => {
-            checkAttr(data, 'user', ['email']);
-            checkEmail(data.email);
+            if (data.email) checkEmail(data.email);
             const updatedUser = await userRepository.update(id, data);
             return updatedUser;
         });

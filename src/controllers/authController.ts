@@ -16,9 +16,13 @@ class AuthController {
 
             const user = await User.findOne({ where: { email } });
 
+            if (!user) {
+                return res.status(401).json({ message: "Invalid email or password." });
+            }
+
             const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-            
-            if (!user || !isPasswordValid) {
+
+            if (!isPasswordValid) {
                 return res.status(401).json({ message: "Invalid email or password." });
             }
 

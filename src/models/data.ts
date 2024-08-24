@@ -17,3 +17,16 @@ export enum Level {
     Veteran = 'veteran',
     Expert = 'expert'
 }
+
+export interface SearchData {
+    coachName?: string,
+    coachIds?: number[],
+    sports?: number[],
+    minDate?: Date,
+    maxDate?: Date,
+    locations?: string[],
+    minPlaces?: number,
+    maxPlaces?: number,
+    minRemainingPlaces?: number,
+    maxRemainingPlaces?: number
+}

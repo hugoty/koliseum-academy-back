@@ -13,6 +13,13 @@ class CourseController {
         }, false);
     }
 
+    async searchCourses(req: Request, res: Response) {
+        await genericController(req, res, async (req: Request, res: Response) => {
+            const courses = await courseService.searchCourses(req.body);
+            res.json(courses);
+        }, false);
+    }
+
     async getById(req: Request, res: Response) {
         await genericController(req, res, async (req: Request, res: Response) => {
             const courseId = Number(req.params.id);

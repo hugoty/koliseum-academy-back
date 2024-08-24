@@ -1,8 +1,6 @@
 import bcrypt from "bcrypt";
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../config/database";
-import Course from "./course"; // Import the Course model
-import Subscription from "./subscription"; // Import the Subscription model
 
 interface IUserAttributes {
     id?: number;
@@ -11,16 +9,15 @@ interface IUserAttributes {
     email: string;
     passwordHash: string;
     salt: string;
+    locations: string;
     dateOfBirth?: Date;
-    subscriptions?: Subscription[];
     roles?: string;
-    courses?: Course[];
 }
 
 interface IUserCreationAttributes
     extends Optional<
         IUserAttributes,
-        "id" | "roles" | "subscriptions" | "courses"
+        "id" | "roles"
     > { }
 
 class User
@@ -32,11 +29,9 @@ class User
     public email!: string;
     public passwordHash!: string;
     public salt!: string;
+    public locations!: string;
     public dateOfBirth?: Date;
     public roles?: string;
-    public subscriptions?: Subscription[];
-    public courses?: Course[];
-    public sports?: string;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -89,6 +84,18 @@ User.init(
             },
             set(value: string[]) {
                 this.setDataValue("roles", JSON.stringify(value));
+            },
+        },
+        locations: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: JSON.stringify([]),
+            get() {
+                const locations = this.getDataValue("locations");
+                return locations ? JSON.parse(locations) : [];
+            },
+            set(value: string[]) {
+                this.setDataValue("locations", JSON.stringify(value));
             },
         }
     },

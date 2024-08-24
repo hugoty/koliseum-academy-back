@@ -12,6 +12,13 @@ class UserController {
         }, false);
     }
 
+    async searchCoaches(req: Request, res: Response) {
+        await genericController(req, res, async (req: Request, res: Response) => {
+            const coaches = await userService.searchCoaches(req.body);
+            res.json(coaches);
+        }, false);
+    }
+
     async create(req: Request, res: Response) {
         await genericController(req, res, async (req: Request, res: Response) => {
             const userData = req.body;

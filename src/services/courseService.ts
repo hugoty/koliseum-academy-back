@@ -1,7 +1,9 @@
-import { Level } from "../models/data";
+import { Level, SearchData } from "../models/data";
+import User from "../models/user";
 import courseRepository from "../repositories/courseRepository";
 import courseSportRepository from "../repositories/courseSportRepository";
 import sportRepository from "../repositories/sportRepository";
+import userRepository from "../repositories/userRepository";
 import { checkAttr } from "../utils/checks";
 import { genericServRepo } from "../utils/error";
 import userService from "./userService";
@@ -28,7 +30,16 @@ class CourseService {
                 throw new Error('CODE400: course\'s sport ids should be an array');
             }
             if (data.sportIds.length === 0) {
-                throw new Error('CODE400: course\'s sport ids array should not be empty');
+                throw new Error('CODE400: course\'s sportIds array should not be empty');
+            }
+            if (!('locations' in data)) {
+                throw new Error('CODE400: course\'s locations are not provided');
+            }
+            if (!Array.isArray(data.locations)) {
+                throw new Error('CODE400: course\'s locations should be an array');
+            }
+            if (data.locations.length === 0) {
+                throw new Error('CODE400: course\'s location array should not be empty');
             }
             for (let sportId of data.sportIds) {
                 try {
@@ -37,11 +48,32 @@ class CourseService {
                     throw new Error(`CODE400: sport id ${sportId} not found`);
                 }
             }
+            if ('remainingPlaces' in data) {
+                if (data.remainingPlaces < 0) {
+                    throw new Error(`CODE400: remainingPlaces (${data.remainingPlaces}) cannot be negative`);
+                }
+                if (data.remainingPlaces > data.places) {
+                    throw new Error(`CODE400: remainingPlaces (${data.remainingPlaces}) cannot be higher than the course's place amount (${data.places})`);
+                }
+            }
+            else data.remainingPlaces = data.places;
             const newCourse = await courseRepository.create(data);
             for (let sportId of data.sportIds) {
                 await courseSportRepository.create({ courseId: newCourse.id, sportId });
             }
             return newCourse;
+        });
+    }
+
+    async searchCourses(data: SearchData) {
+        return await genericServRepo('userService.searchCourses', 'Error searching courses', [], async () => {
+            if (data.coachName) {
+                const coaches = await userRepository.searchCoaches({ coachName: data.coachName });
+                if (coaches.length === 0) return [];
+                data.coachIds = coaches.map((coach: User) => coach.id);
+            }
+            const courses = await courseRepository.searchCourses(data);
+            return courses;
         });
     }
 
@@ -59,6 +91,15 @@ class CourseService {
     async update(id: number, data: any) {
         this.checkLevels(data);
         return await genericServRepo('courseService.update', 'Error updating course', [id, data], async (id, data) => {
+            const course = await courseRepository.getById(id);
+            if ('remainingPlaces' in data) {
+                if (data.remainingPlaces < 0) {
+                    throw new Error(`CODE400: remainingPlaces (${data.remainingPlaces}) cannot be negative`);
+                }
+                if (data.remainingPlaces > course.places) {
+                    throw new Error(`CODE400: remainingPlaces (${data.remainingPlaces}) cannot be higher than the course's place amount (${course.places})`);
+                }
+            }
             const updatedCourse = await courseRepository.update(id, data);
             return updatedCourse;
         });

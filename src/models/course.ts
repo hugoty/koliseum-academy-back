@@ -6,7 +6,8 @@ interface ICourseAttributes {
     startDate: Date;
     endDate: Date;
     places: number;
-    location: string;
+    remainingPlaces: number;
+    locations: string;
     price: number;
     ownerId?: number;
     levels?: string;
@@ -21,7 +22,8 @@ class Course
     public startDate!: Date;
     public endDate!: Date;
     public places!: number;
-    public location!: string;
+    public remainingPlaces!: number;
+    public locations!: string;
     public price!: number;
     public ownerId?: number;
     public levels?: string;
@@ -49,8 +51,8 @@ Course.init(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        location: {
-            type: DataTypes.STRING,
+        remainingPlaces: {
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         price: {
@@ -75,6 +77,18 @@ Course.init(
             references: {
                 model: 'user',
                 key: 'id'
+            },
+        },
+        locations: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: JSON.stringify([]),
+            get() {
+                const locations = this.getDataValue("locations");
+                return locations ? JSON.parse(locations) : [];
+            },
+            set(value: string[]) {
+                this.setDataValue("locations", JSON.stringify(value));
             },
         }
     },

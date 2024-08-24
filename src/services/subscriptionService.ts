@@ -1,4 +1,5 @@
 import { RequestStatus } from "../models/data";
+import courseRepository from "../repositories/courseRepository";
 import subscriptionRepository from "../repositories/subscriptionRepository";
 import { genericServRepo } from "../utils/error";
 import courseService from "./courseService";
@@ -15,6 +16,8 @@ class SubscriptionService {
 
     async create(data: any) {
         return await genericServRepo('subscriptionService.create', 'Error creating subscription', [data], async (data) => {
+            const course = await courseRepository.getById(data.courseId);
+            if (course.remainingPlaces === 0) throw new Error('CODE400: no remaining places in this course');
             const newSubscription = await subscriptionRepository.create(data);
             return newSubscription;
         });
@@ -33,7 +36,10 @@ class SubscriptionService {
         return await genericServRepo('subscriptionService.accept', 'Error accepting subscription', [id], async (id) => {
             const subscription = await subscriptionRepository.getById(id);
             if (subscription.status === RequestStatus.Canceled) throw new Error('Cannot accept a canceled subscription');
+            const course = await courseRepository.getById(subscription.courseId);
+            if (course.remainingPlaces === 0) throw new Error('CODE400: no remaining places in this course');
             const updatedSubscription = await subscriptionRepository.update(id, { status: RequestStatus.Accepted });
+            await courseRepository.update(subscription.courseId, { remainingPlaces: course.remainingPlaces - 1 });
             return updatedSubscription;
         });
     }
@@ -49,7 +55,12 @@ class SubscriptionService {
 
     async cancel(id: number) {
         return await genericServRepo('subscriptionService.cancel', 'Error canceling subscription', [id], async (id) => {
+            const subscription = await subscriptionRepository.getById(id);
             const updatedSubscription = await subscriptionRepository.update(id, { status: RequestStatus.Canceled });
+            if (subscription.status === RequestStatus.Accepted) {
+                const course = await courseRepository.getById(subscription.courseId);
+                await courseRepository.update(subscription.courseId, { remainingPlaces: course.remainingPlaces + 1 });
+            }
             return updatedSubscription;
         });
     }
