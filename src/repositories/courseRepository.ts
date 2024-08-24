@@ -130,6 +130,7 @@ class CourseRepository {
                 throw new Error('CODE404: Course not found');
             }
             data = checkAttr(data, 'course', [], ['ownerId', 'id']);
+            const newCourse = { ...course, data };
             await course.update(data);
             return course;
         });

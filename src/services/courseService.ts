@@ -11,7 +11,6 @@ import userService from "./userService";
 class CourseService {
 
     private checkLevels(data: any) {
-        checkAttr(data, 'course', ['levels']);
         if (!Array.isArray(data.levels)) {
             throw new Error('CODE400: course\'s levels attribute should be an array');
         }
@@ -22,18 +21,13 @@ class CourseService {
 
     async create(data: any) {
         return await genericServRepo('courseService.create', 'Error creating course', [data], async (data) => {
+            checkAttr(data, 'course', ['levels', 'sportIds', 'locations']);
             this.checkLevels(data);
-            if (!('sportIds' in data)) {
-                throw new Error('CODE400: course\'s sport ids are not provided');
-            }
             if (!Array.isArray(data.sportIds)) {
                 throw new Error('CODE400: course\'s sport ids should be an array');
             }
             if (data.sportIds.length === 0) {
                 throw new Error('CODE400: course\'s sportIds array should not be empty');
-            }
-            if (!('locations' in data)) {
-                throw new Error('CODE400: course\'s locations are not provided');
             }
             if (!Array.isArray(data.locations)) {
                 throw new Error('CODE400: course\'s locations should be an array');
@@ -98,7 +92,7 @@ class CourseService {
     }
 
     async update(id: number, data: any) {
-        this.checkLevels(data);
+        if (data.levels) this.checkLevels(data);
         return await genericServRepo('courseService.update', 'Error updating course', [id, data], async (id, data) => {
             const course = await courseRepository.getById(id);
             if ('remainingPlaces' in data) {

@@ -11,6 +11,7 @@ interface ICourseAttributes {
     price: number;
     ownerId?: number;
     levels?: string;
+    detail?: string;
 }
 
 interface ICourseCreationAttributes extends Optional<ICourseAttributes, "id"> { }
@@ -27,6 +28,7 @@ class Course
     public price!: number;
     public ownerId?: number;
     public levels?: string;
+    public detail?: string;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -58,6 +60,10 @@ Course.init(
         price: {
             type: DataTypes.FLOAT,
             allowNull: false,
+        },
+        detail: {
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         levels: {
             type: DataTypes.STRING,
