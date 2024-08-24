@@ -73,7 +73,15 @@ class CourseService {
                 data.coachIds = coaches.map((coach: User) => coach.id);
             }
             const courses = await courseRepository.searchCourses(data);
-            return courses;
+            const res = [];
+            for (const course of courses) {
+                const owner = await userService.getById(course.ownerId);
+                delete owner.ownedCourses;
+                course.dataValues.owner = owner;
+                delete course.dataValues.ownerId;
+                res.push(course);
+            }
+            return res;
         });
     }
 
@@ -84,6 +92,7 @@ class CourseService {
             const owner = await userService.getById(course.ownerId);
             delete owner.ownedCourses;
             course.dataValues.owner = owner;
+            delete course.dataValues.ownerId;
             return course;
         });
     }
