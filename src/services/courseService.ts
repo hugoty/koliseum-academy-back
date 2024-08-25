@@ -1,4 +1,5 @@
 import { CourseSearchData, Level } from "../models/data";
+import Sport from "../models/sport";
 import User from "../models/user";
 import courseRepository from "../repositories/courseRepository";
 import courseSportRepository from "../repositories/courseSportRepository";
@@ -103,6 +104,18 @@ class CourseService {
                 }
                 if (data.remainingPlaces > course.places) {
                     throw new Error(`CODE400: remainingPlaces (${data.remainingPlaces}) cannot be higher than the course's place amount (${course.places})`);
+                }
+            }
+            if (
+                'sportIds' in data &&
+                Array.isArray(data.sportIds)
+            ) {
+                if (data.sportIds.length === 0) throw new Error(`CODE400: a course must have at least one sport`);
+                for (const sportId of data.sportIds) {
+                    if (!course.Sports.some((sport: Sport) => sport.id === sportId)) await courseSportRepository.create({ courseId: id, sportId });
+                }
+                for (const sport of course.Sports) {
+                    if (!data.sportIds.includes(sport.id)) await courseSportRepository.delete(sport.CourseSport.id);
                 }
             }
             const updatedCourse = await courseRepository.update(id, data);
