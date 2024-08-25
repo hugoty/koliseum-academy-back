@@ -7,7 +7,7 @@ import { verifyToken } from "../middlewares/verifyToken";
 const userRouter = express.Router();
 
 userRouter.get("/", verifyToken, userController.getProfile);
-userRouter.get("/search-coaches", userController.searchCoaches);
+userRouter.post("/search-coaches", userController.searchCoaches);
 userRouter.post("/:id/grant-coach", verifyToken, verifyAdmin, userController.grantCoachRole);
 userRouter.post("/:id/revoke-coach", verifyToken, verifyAdmin, userController.revokeCoachRole);
 userRouter.post("/create", userController.create);
