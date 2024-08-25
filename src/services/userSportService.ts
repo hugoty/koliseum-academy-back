@@ -1,12 +1,11 @@
 import { Level } from "../models/data";
 import userSportRepository from "../repositories/userSportRepository";
-import { checkAttr } from "../utils/checks";
 import { genericServRepo } from "../utils/error";
 
 class UserSportService {
 
     private checkLevel(data: any) {
-        checkAttr(data, 'course', ['level']);
+        if (!('level' in data)) return;
         if (typeof data.level !== 'string') {
             throw new Error('CODE400: user\'s sport\'s level attribute should be a string');
         }

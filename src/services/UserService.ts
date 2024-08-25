@@ -1,9 +1,12 @@
 import bcrypt from 'bcrypt';
 import { CoachSearchData, Role } from '../models/data';
+import Sport from '../models/sport';
 import courseRepository from "../repositories/courseRepository";
 import userRepository from "../repositories/userRepository";
+import userSportRepository from '../repositories/userSportRepository';
 import { checkAttr, checkEmail, isCoach } from "../utils/checks";
 import { genericServRepo } from "../utils/error";
+import userSportService from './userSportService';
 
 class UserService {
 
@@ -85,6 +88,35 @@ class UserService {
     async update(id: number, data: any) {
         return await genericServRepo('userService.update', 'Error updating user', [id, data], async (id, data) => {
             if (data.email) checkEmail(data.email);
+            if (
+                'sports' in data &&
+                Array.isArray(data.sports)
+            ) {
+                const user = await this.getById(id, false);
+                for (const sport of data.sports) {
+                    if (!('id' in sport) || typeof sport.id !== 'number') throw new Error('CODE400: sports property must be an array of { id: number; level?: Level }');
+                    const sportInUser = user.Sports.find((sp: Sport) => sp.id === sport.id);
+                    if (sportInUser) {
+                        if (
+                            'level' in sport &&
+                            sport.level &&
+                            sportInUser.level !== sport.level
+                        ) {
+                            await userSportService.update(sportInUser.UserSport.id, { level: sport.level });
+                        }
+                    }
+                    else {
+                        const userSport = { userId: id, sportId: sport.id };
+                        if (sport.level) (userSport as any).level = sport.level;
+                        await userSportService.create(userSport);
+                    }
+                }
+                for (const sport of user.Sports) {
+                    if (!data.sports.some((sp: { id: number }) => sp.id === sport.id)) {
+                        await userSportRepository.delete(sport.UserSport.id);
+                    }
+                }
+            }
             const updatedUser = await userRepository.update(id, data);
             return updatedUser;
         });
