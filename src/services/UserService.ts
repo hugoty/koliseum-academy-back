@@ -4,7 +4,7 @@ import Sport from '../models/sport';
 import courseRepository from "../repositories/courseRepository";
 import userRepository from "../repositories/userRepository";
 import userSportRepository from '../repositories/userSportRepository';
-import { checkAttr, checkEmail, isCoach } from "../utils/checks";
+import { checkAttr, checkEmail, checkPassword, isCoach } from "../utils/checks";
 import { genericServRepo } from "../utils/error";
 import userSportService from './userSportService';
 
@@ -29,6 +29,7 @@ class UserService {
             try {
                 checkAttr(data, 'user', ['email', 'password']);
                 checkEmail(data.email);
+                checkPassword(data.password);
                 const existingUser = await userRepository.getByEmail(data.email);
                 if (existingUser) throw new Error('CODE400: Email already used');
             } catch (error: any) {
@@ -87,7 +88,8 @@ class UserService {
 
     async update(id: number, data: any) {
         return await genericServRepo('userService.update', 'Error updating user', [id, data], async (id, data) => {
-            if (data.email) checkEmail(data.email);
+            if ('email' in data) checkEmail(data.email);
+            if ('password' in data) checkPassword(data.password);
             if (
                 'sports' in data &&
                 Array.isArray(data.sports)

@@ -20,7 +20,11 @@ export function checkAttr(obj: any, errorKey: string, required: string[], forbid
 }
 
 export function checkEmail(email: string) {
-    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(email)) throw new Error('Invalid Email format');
+    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(email)) throw new Error('CODE400: Invalid Email format');
+}
+
+export function checkPassword(password: string) {
+    if (!password || password.length < 8) throw new Error('CODE400: Password should be a string of 8 chars or more')
 }
 
 export function isAdmin(user: User) { return user.roles?.includes(Role.Admin); }
