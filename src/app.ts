@@ -1,6 +1,8 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express, { Application } from "express";
+import helmet from "helmet";
+import sanitizeInput from "./middlewares/sanitizeInput";
 import { sequelize } from "./models";
 import authRouter from "./routes/authRoutes";
 import courseRouter from "./routes/courseRoutes";
@@ -17,6 +19,12 @@ app.use(express.json());
 
 // enable cors
 app.use(cors());
+
+// Enable Helmet protection
+app.use(helmet());
+
+// Sanitize inputs against code injection
+app.use(sanitizeInput);
 
 const syncDatabase = async () => {
     try {
@@ -40,3 +48,4 @@ app.use("/auth", authRouter);
 app.use("/sport", sportRouter);
 
 export { app };
+
