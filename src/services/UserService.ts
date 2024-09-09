@@ -6,6 +6,7 @@ import userRepository from "../repositories/userRepository";
 import userSportRepository from '../repositories/userSportRepository';
 import { checkAttr, checkEmail, checkPassword, isCoach } from "../utils/checks";
 import { genericServRepo } from "../utils/error";
+import courseService from './courseService';
 import userSportService from './userSportService';
 
 class UserService {
@@ -20,7 +21,14 @@ class UserService {
     async searchCoaches(data: CoachSearchData) {
         return await genericServRepo('userService.searchCoaches', 'Error searching coaches', [], async () => {
             const coaches = await userRepository.searchCoaches(data);
-            return coaches;
+            const res = [];
+            for (const coach of coaches) {
+                const coachWithCourses = coach.dataValues;
+                const coachesOwnedCourses = await courseRepository.getCoachCourses(coach.id);
+                coachWithCourses.ownedCourses = coachesOwnedCourses;
+                res.push(coachWithCourses);
+            }
+            return res;
         });
     }
 
@@ -60,6 +68,14 @@ class UserService {
                 firstName: user.firstName,
                 lastName: user.lastName
             };
+            else if (res.Courses) {
+                const coursesWithSports = [];
+                for (const course of res.Courses) {
+                    const courseWithSports = course.id ? await courseService.getById(course.id) : course;
+                    coursesWithSports.push(courseWithSports);
+                }
+                res.Courses = coursesWithSports;
+            }
             if (user.roles.includes(Role.Coach)) {
                 res.Sports = user.Sports;
                 res.ownedCourses = await courseRepository.getCoachCourses(user.id);

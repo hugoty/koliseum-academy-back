@@ -56,12 +56,12 @@ class SubscriptionService {
     async cancel(id: number) {
         return await genericServRepo('subscriptionService.cancel', 'Error canceling subscription', [id], async (id) => {
             const subscription = await subscriptionRepository.getById(id);
-            const updatedSubscription = await subscriptionRepository.update(id, { status: RequestStatus.Canceled });
+            await subscriptionRepository.delete(id);
             if (subscription.status === RequestStatus.Accepted) {
                 const course = await courseRepository.getById(subscription.courseId);
                 await courseRepository.update(subscription.courseId, { remainingPlaces: course.remainingPlaces + 1 });
             }
-            return updatedSubscription;
+            return { message: "Subscription deleted successfully" };
         });
     }
 
