@@ -72,9 +72,8 @@ class UserService {
                 const coursesWithSports = [];
                 for (const course of res.Courses) {
                     const courseWithSports = course.id ? await courseService.getById(course.id) : course;
-                    coursesWithSports.push(courseWithSports);
+                    coursesWithSports.push({ ...course, courseWithSports });
                 }
-                res.Courses = coursesWithSports;
             }
             if (user.roles.includes(Role.Coach)) {
                 res.Sports = user.Sports;
