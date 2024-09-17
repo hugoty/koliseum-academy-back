@@ -1,0 +1,30 @@
+{
+  "development": {
+    "username": "root",
+    "password": "llN6NEkpbkYkeYQ34zPK91Vtevm0b961",
+    "database": "koliseum",
+    "host": "dpg-crfhhj2j1k6c73dmqh80-a.oregon-postgres.render.com",
+    "port": 5432,
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
