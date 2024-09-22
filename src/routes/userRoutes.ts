@@ -1,5 +1,5 @@
 import express from "express";
-import userController from "../controllers/userController";
+import userController from "../controllers/UserController";
 import userSportController from "../controllers/userSportController";
 import { verifyAdmin } from "../middlewares/verifyAdmin";
 import { verifyToken } from "../middlewares/verifyToken";
