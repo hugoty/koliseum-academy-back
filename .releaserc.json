@@ -1,0 +1,24 @@
+{
+    "branches": ["main"],
+    "repositoryUrl": "https://github.com/IPtitLu/koliseum-academy-back",
+    "plugins": [
+        [
+            "semantic-release-gitmoji",
+            {
+                "releaseRules": {
+                    ":boom:": "major",
+                    ":sparkles:": "minor",
+                    ":bug:": "patch"
+                }
+            }
+        ],
+        "@semantic-release/github",
+        [
+            "@semantic-release/git",
+            {
+                "assets": ["package.json", "package-lock.json", "CHANGELOG.md"],
+                "message": ":bookmark: Release ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+            }
+        ]
+    ]
+}
