@@ -38,7 +38,7 @@ L'application Back-End Koliseum Academy suit un modèle d'architecture en couche
 
 ### Model
 
-La couche Modèle est responsable de la gestion des données et de la logique métier. Elle interagit avec la base de données et effectue des opérations telles que la création, la lecture, la mise à jour et la suppression (CRUD) des données. Dans cette application, la couche Modèle est représentée par les modèles Mongoose, comme le modèle User dans src/models/User.ts.
+La couche Modèle est responsable de la gestion des données et de la logique métier. Elle interagit avec la base de données et effectue des opérations telles que la création, la lecture, la mise à jour et la suppression (CRUD) des données. Dans cette application, la couche Modèle est représentée par les modèles Mongoose, comme le modèle User dans src/models/user.ts.
 
 ### Controller
 
