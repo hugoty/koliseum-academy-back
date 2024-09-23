@@ -1,0 +1,86 @@
+name: Back-end CI/CD Pipeline
+
+on:
+    pull_request:
+        branches:
+            - main
+    push:
+        branches:
+            - main
+
+permissions:
+    contents: write
+    issues: write
+
+jobs:
+    test:
+        name: Run Tests
+        runs-on: ubuntu-latest
+        if: github.event_name == 'pull_request'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "16"
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Run tests
+              run: npm test
+
+    build:
+        name: Build Application
+        runs-on: ubuntu-latest
+        if: github.event_name == 'pull_request'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "16"
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Build
+              run: npm run build
+
+    release:
+        name: Semantic Release
+        runs-on: ubuntu-latest
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+              with:
+                  persist-credentials: false
+
+            - name: Set up Node.js (>= 20.8.1)
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "20.8.1"
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Install semver
+              run: npm install --save-dev semantic-release
+
+            - name: Install plugins
+              run: npm install --save-dev semantic-release-gitmoji@latest
+
+            - name: Configure Git User
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+            - name: Semantic Release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: npx semantic-release

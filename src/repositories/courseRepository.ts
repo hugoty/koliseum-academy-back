@@ -96,7 +96,15 @@ class CourseRepository {
     async getCoachCourses(id: number) {
         return await genericServRepo('courseRepository.getCoachCourses', 'Error fetching coach\'s courses', [id], async (id) => {
             const courses = await Course.findAll({
-                where: { ownerId: id }
+                where: { ownerId: id },
+                include: [
+                    {
+                        model: Sport,
+                        through: {
+                            attributes: ['id']
+                        }
+                    }
+                ]
             });
             if (!courses) {
                 throw new Error('CODE404: Courses not found');

@@ -69,7 +69,7 @@ class SubscriptionController {
             const subscription = await subscriptionService.getById(subscriptionId);
             if (
                 !isAdmin((req as any).user) &&
-                subscription.dataValues.course.ownerId !== (req as any).user.id
+                subscription.dataValues.course.dataValues.owner.id !== (req as any).user.id
             ) throw new Error('CODE403: The user is not the owner of the course');
             const updatedSubscription = await subscriptionService.accept(subscriptionId);
             res.json(updatedSubscription);
