@@ -1,6 +1,6 @@
 import request from 'supertest';
 import express from 'express';
-import userController from '../../controllers/UserController';
+import userController from '../../controllers/userController';
 import userService from '../../services/userService';
 import { isAdmin } from '../../utils/checks';
 
