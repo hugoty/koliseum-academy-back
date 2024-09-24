@@ -90,6 +90,7 @@ class UserService {
                         id: user.id,
                         firstName: user.firstName,
                         lastName: user.lastName,
+                        profilePicture: user.profilePicture,
                     };
                 else if (res.Courses) {
                     const coursesWithSports = [];
