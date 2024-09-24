@@ -199,13 +199,15 @@ class UserService {
                     }
                 }
 
-                const salt = await bcrypt.genSalt(12);
-                const passwordHash = await bcrypt.hash(data.password, salt);
+                if ("password" in data) {
+                    const salt = await bcrypt.genSalt(12);
+                    const passwordHash = await bcrypt.hash(data.password, salt);
 
-                // Add passwordHash and salt to the user data
-                data.passwordHash = passwordHash;
-                data.salt = salt;
-                delete data.password;
+                    // Add passwordHash and salt to the user data
+                    data.passwordHash = passwordHash;
+                    data.salt = salt;
+                    delete data.password;
+                }
 
                 const updatedUser = await userRepository.update(id, data);
                 return updatedUser;
